@@ -25,7 +25,7 @@ Wird über `targetdir` ein Wert übergeben, wird nötigenfalls ein entsprechende
 
 Mit folgendem Code lassen sich die Metadaten-XML-Files zur Suchanfrage "tulpe" mit Filtereinschränkung auf den Ort Berlin und die Zeit von 1920 bis 1950 herunterladen.
 
-![DDB-Suchanfrage](img/ddb_tulpe.png){ width = 50% }
+![DDB-Suchanfrage](img/ddb_tulpe.png)
 
 Es wird dafür eine Ordner `tulpe_berlin` erzeugt.
 
