@@ -8,7 +8,13 @@ def search2API(queryurl:str, api_key:str) -> str:
     converts the url generated via the search interface of DDB
     into an API call for the DDB API
     '''
-    endpoint = "https://api.deutsche-digitale-bibliothek.de/search?"
+    
+    if "search/organization?" in queryurl:
+        endpoint = "https://api.deutsche-digitale-bibliothek.de/search/organization?"
+    elif "search/person?" in queryurl:
+        endpoint = "https://api.deutsche-digitale-bibliothek.de/search/person?"
+    else:
+        endpoint = "https://api.deutsche-digitale-bibliothek.de/search?"
     parsed_url = urlparse(queryurl)
     queries = parse_qs(parsed_url.query)
     query = " ".join(queries.get('query'))
