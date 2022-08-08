@@ -17,8 +17,13 @@ def search2API(queryurl:str, api_key:str) -> str:
         endpoint = "https://api.deutsche-digitale-bibliothek.de/search?"
     parsed_url = urlparse(queryurl)
     queries = parse_qs(parsed_url.query)
-    query = " ".join(queries.get('query'))
-    default_values = [f"query={quote_plus(query)}", f"oauth_consumer_key={api_key}"]
+    default_values = [f"oauth_consumer_key={api_key}"]
+    try:
+        query = " ".join(queries.get('query'))
+        default_values.append(f"query={quote_plus(query)}")
+    except Exception as e:
+        print("No query in search url.")
+    
     if queries.get('facetValues[]'):
         print("facets:")
         print(queries.get('facetValues[]'))
@@ -99,45 +104,10 @@ def datasetFromObject(object_ID:str, api_key) -> str:
     apiurl = f"https://api.deutsche-digitale-bibliothek.de/search?query=dataset_id%3A%28{dataset_ID}%29&oauth_consumer_key={api_key}"
     return apiurl
 
-def thumbFlipbook(objectlist: list, filename = "ddb_art.gif",  img_number = 10, duration = 100):
+def getItem(itemid:str, api_key) -> requests.models.Response:
     '''
-    Macht aus dem Output von iterateAPICall eine Gif-Datei.
-    Beschränkung der Bilderzahl auf img_number.
-    Wenn img_number = None, dann werden alle Bilder in eine Gif konvertiert.
-    Dateiname der Gif kann mit "filename" verändert werden.
-    Funktioniert aktuell nur bei gleichgroßen Bildern.
+    Returns the Archive Information Package (AIP) of a DDB item (nach DDB-Doku)
     '''
-    from PIL import Image
-    from io import BytesIO
-    from time import sleep
-
-    if img_number <= len(objectlist):
-        n = img_number
-    else:
-        n = len(objectlist)
+    res = requests.get(f"https://api.deutsche-digitale-bibliothek.de/items/{itemid}?oauth_consumer_key={api_key}")
     
-    thumbnails = []
-
-    for x in objectlist[:n]:
-        try:
-            thumbnail_uuid = x.get('thumbnail')
-            res = requests.get(f"https://iiif.deutsche-digitale-bibliothek.de/image/2/{thumbnail_uuid}/full/!116,87/0/default.jpg")
-            img = Image.open(BytesIO(res.content))
-            thumbnails.append(img)
-            sleep(1)
-        except Exception as e:
-            print(e)
-    
-    if len(thumbnails) > 0:
-        frame_one = thumbnails[0]
-        frame_one.save(
-            filename,
-            format="GIF",
-            append_images=thumbnails,
-            save_all=True,
-            duration=duration,
-            loop=0
-            )
-    else:
-        print("Keine Thumbnails vorhanden.")
-        
+    return res
